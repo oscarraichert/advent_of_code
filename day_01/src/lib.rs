@@ -5,7 +5,7 @@ mod tests {
     #[test]
     fn trebuchet_01() {
         let input_lines = include_str!("trebuchet_input.txt").lines();
-        let mut coordinates = Vec::new();
+        let mut calibrations = Vec::new();
 
         for line in input_lines {
             let chars = line.chars();
@@ -14,13 +14,13 @@ mod tests {
             let first_num = nums.first().expect("no number").to_owned();
             let last_num = nums.last().expect("no number").to_owned();
 
-            coordinates.push(first_num * 10 + last_num);
+            calibrations.push(first_num * 10 + last_num);
         }
 
         let mut result = 0;
 
-        for coordinate in coordinates {
-            result += coordinate;
+        for calibration in calibrations {
+            result += calibration;
         }
 
         println!("{result}");
@@ -71,7 +71,7 @@ mod tests {
     }
 
     fn get_line_calibration(line: &str, nums: &HashMap<&str, u32>) -> u32 {
-        let mut line_coordinates: Vec<(usize, u32)> = Vec::new();
+        let mut line_calibrations: Vec<(usize, u32)> = Vec::new();
 
         let digits_char: Vec<_> = line.chars().filter(|x| x.is_digit(10)).collect();
 
@@ -89,8 +89,8 @@ mod tests {
                 .flat_map(|x| x.1.parse::<u32>().map(|y| (x.0, y)))
                 .collect();
 
-            line_coordinates.append(&mut first_digit);
-            line_coordinates.append(&mut last_digit);
+            line_calibrations.append(&mut first_digit);
+            line_calibrations.append(&mut last_digit);
         }
 
         for extensive_num in nums.keys() {
@@ -100,17 +100,17 @@ mod tests {
                     .map(|x| (x.0, nums.get(x.1).expect("no conversion").to_owned()))
                     .collect();
 
-                line_coordinates.append(&mut extensive_num_index);
+                line_calibrations.append(&mut extensive_num_index);
             }
         }
 
-        let first_num = line_coordinates
+        let first_num = line_calibrations
             .iter()
             .min_by(|a, b| a.0.cmp(&b.0))
             .expect("nonexistent")
             .1;
 
-        let last_num = line_coordinates
+        let last_num = line_calibrations
             .iter()
             .max_by(|a, b| a.0.cmp(&b.0))
             .expect("nonexistent")
