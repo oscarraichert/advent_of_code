@@ -4,14 +4,51 @@ struct Game {
     sets: Vec<Set>,
 }
 
-type Set = (u8, String);
+type Set = (u16, String);
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn cube_conundrum_01_ex() {
+    fn cube_conundrum_01() {
+        let games = get_games();
+
+        let result: u16 = games
+            .iter()
+            .filter(|game| {
+                game.sets.iter().all(|set| match set.1.as_str() {
+                    "red" => set.0 <= 12,
+                    "green" => set.0 <= 13,
+                    "blue" => set.0 <= 14,
+                    _ => unreachable!(),
+                })
+            })
+            .map(|valid_game| valid_game.id)
+            .sum();
+
+        println!("{result}")
+    }
+
+    #[test]
+    fn cube_conundrum_02() {
+        let games = get_games();
+
+        
+        let result: u16 = games.iter().map(|game| {
+            let f = |color| game.sets.iter().filter(|set| set.1 == color).map(|set| set.0).max().unwrap();
+
+            let red = f("red");
+            let green = f("green");
+            let blue = f("blue");
+
+            red * green * blue
+        }).sum();
+
+        println!("{result}")
+    }
+
+    fn get_games() -> Vec<Game> {
         let input_lines = include_str!("cube_conundrum_input.txt").lines();
 
         let mut games = Vec::new();
@@ -42,20 +79,6 @@ mod tests {
             let game = Game { id, sets };
             games.push(game);
         }
-
-        let result: u16 = games
-            .iter()
-            .filter(|game| {
-                game.sets.iter().all(|set| match set.1.as_str() {
-                    "red" => set.0 <= 12,
-                    "green" => set.0 <= 13,
-                    "blue" => set.0 <= 14,
-                    _ => unreachable!(),
-                })
-            })
-            .map(|valid_game| valid_game.id)
-            .sum();
-
-        println!("{result}")
+        games
     }
 }
