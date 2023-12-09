@@ -8,32 +8,20 @@ mod tests {
         let lines = input.lines();
         let matrix: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
 
-        let x_size = matrix.get(0).unwrap().len();
-        let y_size = lines.clone().collect::<Vec<_>>().len();
+        let mut nums: Vec<(usize, usize, usize)> = Vec::new();
 
-        let mut digits: Vec<_> = Vec::new();
-        let mut symbols: Vec<_> = Vec::new();
+        for (y, line) in lines.enumerate() {
+            let mut chars = line.chars().enumerate();
+            while let Some((x, char)) = chars.next() {
+                
+                if char.is_digit(10) {
+                    let num: String = chars.clone().take_while(|c| c.1.is_digit(10)).map(|c| c.1).collect();
+                    nums.push((y, x, (format!("{char}") + &num).parse().unwrap()));
 
-        for line in lines.enumerate() {
-            let chars = line.1.chars();
-            let char_enum = chars.enumerate();
-
-            let mut line_digits: Vec<_> = char_enum
-                .to_owned()
-                .filter_map(|c| c.1.to_digit(10).map(|v| (line.0, c.0, v)))
-                .collect();
-
-            let mut line_symbols: Vec<_> = char_enum
-                .filter(|c| !c.1.is_digit(10))
-                .filter(|c| c.1 != '.')
-                .map(|s| (line.0, s.0, s.1))
-                .collect();
-
-            digits.append(&mut line_digits);
-            symbols.append(&mut line_symbols);
+                    chars.nth(num.len());
+                }
+            }
         }
-
-        println!("{digits:?}");
-        println!("{symbols:?}")
+        println!("{nums:?}")
     }
 }
