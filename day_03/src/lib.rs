@@ -9,8 +9,9 @@ mod tests {
         let matrix: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
 
         let mut nums: Vec<(usize, usize, usize)> = Vec::new();
+        let mut symbols = Vec::new();
 
-        for (y, line) in lines.enumerate() {
+        for (y, line) in lines.clone().enumerate() {
             let mut chars = line.chars().enumerate();
             while let Some((x, char)) = chars.next() {
                 
@@ -22,6 +23,18 @@ mod tests {
                 }
             }
         }
-        println!("{nums:?}")
+
+        for (y, line) in lines.enumerate() {
+            let mut chars = line.chars().enumerate();
+            while let Some((x, char)) = chars.next() {
+
+                if !char.is_digit(10) && char != '.' {
+                    symbols.push((y, x, char));
+                }
+            }
+        }
+
+        println!("{nums:?}");
+        println!("{symbols:?}")
     }
 }
