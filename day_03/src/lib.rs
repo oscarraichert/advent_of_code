@@ -3,8 +3,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn gear_ratios_01_ex() {
-        let input = include_str!("ex_input.txt");
+    fn gear_ratios_01() {
+        let input = include_str!("input.txt");
         let lines = input.lines();
         let matrix: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
 
@@ -26,22 +26,72 @@ mod tests {
         println!("{parts_sum}")
     }
 
-    fn check_adjacent_symbol(num: &(usize, usize, usize), symbols: &[(usize, usize, char)], last_line: usize, line_len: usize) -> bool {
+    #[test]
+    fn gear_ratios_01_ex() {
+        let input = include_str!("input_jx.txt");
+        let lines = input.lines();
+        let matrix: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
+
+        let line_count = matrix.len();
+        let line_len = matrix.get(0).unwrap().len();
+        let nums = get_nums(&lines);
+        let symbols = get_symbols(lines);
+
+        let mut parts_sum = 0;
+
+        for num in &nums {
+            let symbol_next_to = check_adjacent_symbol(num, &symbols, line_count, line_len);
+
+            if symbol_next_to {
+                parts_sum += num.2;
+            }
+        }
+
+        println!("{parts_sum}");
+        assert_eq!(parts_sum, 540212)
+    }
+
+    fn check_adjacent_symbol(
+        num: &(usize, usize, usize),
+        symbols: &[(usize, usize, char)],
+        last_line: usize,
+        line_len: usize,
+    ) -> bool {
         let mut syms = Vec::new();
 
-        let mut sym_over: Vec<_> = symbols.iter().filter(|x| if num.0 > 0 { x.0 == num.0 - 1 } else { false }).collect();
-        let mut sym_under:Vec<_> = symbols.iter().filter(|x| if num.0 < last_line { x.0 == num.0 + 1 } else { false }).collect();
+        let mut sym_over: Vec<_> = symbols
+            .iter()
+            .filter(|x| if num.0 > 0 { x.0 == num.0 - 1 } else { false })
+            .collect();
+        let mut sym_under: Vec<_> = symbols
+            .iter()
+            .filter(|x| {
+                if num.0 < last_line {
+                    x.0 == num.0 + 1
+                } else {
+                    false
+                }
+            })
+            .collect();
 
         syms.append(&mut sym_over);
         syms.append(&mut sym_under);
 
-        let left = syms
-            .iter()
-            .any(|s| if num.1 != 0 { s.1 >= num.1 - 1 && s.1 <= num.1 + num.2.to_string().len() - 1 } else { false });
+        let left = syms.iter().any(|s| {
+            if num.1 != 0 {
+                s.1 >= num.1 - 1 && s.1 <= num.1 + num.2.to_string().len() - 1
+            } else {
+                false
+            }
+        });
 
-        let right = syms
-            .iter()
-            .any(|s| if num.1 < line_len { s.1 >= num.1 && s.1 >= num.1 + num.2.to_string().len() } else { false });
+        let right = syms.iter().any(|s| {
+            if num.1 < line_len {
+                s.1 >= num.1 && s.1 >= num.1 + num.2.to_string().len() + 1
+            } else {
+                false
+            }
+        });
 
         left | right
     }
