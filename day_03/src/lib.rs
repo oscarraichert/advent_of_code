@@ -11,8 +11,36 @@ mod tests {
         let nums = get_nums(&lines);
         let symbols = get_symbols(lines);
 
-        println!("{nums:?}");
-        println!("{symbols:?}");
+        for num in &nums {
+            let num_l = num.2.to_string().len();
+            let num_crd = (num.0, num.1, num_l);
+
+            let result = symbol_next_to(num, &symbols);
+
+            if result {
+                println!("{num:?}");
+            }
+            println!("{result}");
+        }
+
+        // println!("{nums:?}");
+        // println!("{symbols:?}");
+    }
+
+    fn symbol_next_to(num: &(usize, usize, usize), symbols: &[(usize, usize, char)]) -> bool {
+        let left = symbols
+            .iter()
+            .any(|s| if num.1 != 0 { s.1 == num.1 - 1 } else { false });
+
+        let right = symbols
+            .iter()
+            .any(|s| s.1 == num.1 + num.2.to_string().len());
+
+        if left | right {
+            return true;
+        }
+
+        false
     }
 
     fn get_symbols(lines: std::str::Lines<'_>) -> Vec<(usize, usize, char)> {
