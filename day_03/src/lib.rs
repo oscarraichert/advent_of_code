@@ -8,39 +8,42 @@ mod tests {
         let lines = input.lines();
         let matrix: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
 
+        let line_count = matrix.len();
+        let line_len = matrix.get(0).unwrap().len();
         let nums = get_nums(&lines);
         let symbols = get_symbols(lines);
 
+        let mut parts_sum = 0;
+
         for num in &nums {
-            let num_l = num.2.to_string().len();
-            let num_crd = (num.0, num.1, num_l);
+            let symbol_next_to = check_adjacent_symbol(num, &symbols, line_count, line_len);
 
-            let result = symbol_next_to(num, &symbols);
-
-            if result {
-                println!("{num:?}");
+            if symbol_next_to {
+                parts_sum += num.2;
             }
-            println!("{result}");
         }
 
-        // println!("{nums:?}");
-        // println!("{symbols:?}");
+        println!("{parts_sum}")
     }
 
-    fn symbol_next_to(num: &(usize, usize, usize), symbols: &[(usize, usize, char)]) -> bool {
-        let left = symbols
+    fn check_adjacent_symbol(num: &(usize, usize, usize), symbols: &[(usize, usize, char)], last_line: usize, line_len: usize) -> bool {
+        let mut syms = Vec::new();
+
+        let mut sym_over: Vec<_> = symbols.iter().filter(|x| if num.0 > 0 { x.0 == num.0 - 1 } else { false }).collect();
+        let mut sym_under:Vec<_> = symbols.iter().filter(|x| if num.0 < last_line { x.0 == num.0 + 1 } else { false }).collect();
+
+        syms.append(&mut sym_over);
+        syms.append(&mut sym_under);
+
+        let left = syms
             .iter()
-            .any(|s| if num.1 != 0 { s.1 == num.1 - 1 } else { false });
+            .any(|s| if num.1 != 0 { s.1 >= num.1 - 1 && s.1 <= num.1 + num.2.to_string().len() - 1 } else { false });
 
-        let right = symbols
+        let right = syms
             .iter()
-            .any(|s| s.1 == num.1 + num.2.to_string().len());
+            .any(|s| if num.1 < line_len { s.1 >= num.1 && s.1 >= num.1 + num.2.to_string().len() } else { false });
 
-        if left | right {
-            return true;
-        }
-
-        false
+        left | right
     }
 
     fn get_symbols(lines: std::str::Lines<'_>) -> Vec<(usize, usize, char)> {
